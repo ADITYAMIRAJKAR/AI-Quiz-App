@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Document Quiz</title>
+    <style>
+        :root { --primary: #10B981; --bg-color: #F3F4F6; --card-bg: #FFFFFF; --text: #1F2937; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text); padding: 40px 20px; display: flex; justify-content: center; }
+        .container { max-width: 700px; width: 100%; }
+        h1, h2 { text-align: center; color: var(--primary); }
+        .card { background: var(--card-bg); padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 24px; }
+        input[type="file"] { width: 100%; padding: 12px; border: 2px dashed #D1D5DB; border-radius: 8px; margin-bottom: 16px; cursor: pointer; }
+        button { background-color: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; }
+        button:hover { background-color: #059669; }
+        button:disabled { background-color: #9CA3AF; cursor: not-allowed; }
+        
+        .question-block { margin-bottom: 20px; padding: 16px; background: #F9FAFB; border-radius: 8px; border: 1px solid #E5E7EB; }
+        .question-text { font-weight: bold; margin-bottom: 12px; }
+        .option-label { display: block; padding: 8px; margin-bottom: 4px; background: white; border-radius: 4px; border: 1px solid #D1D5DB; cursor: pointer; }
+        .option-label:hover { background: #ECFDF5; }
+        
+        .feedback { margin-top: 10px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
+        .feedback.correct { background: #D1FAE5; color: #065F46; border: 1px solid #34D399; display: block; }
+        .feedback.incorrect { background: #FEE2E2; color: #991B1B; border: 1px solid #F87171; display: block; }
+        
+        #loader { display: none; text-align: center; font-weight: bold; color: #6B7280; margin: 20px 0; }
+        #quiz-container, #results-container { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📚 AI Document Quiz</h1>
+    
+    <div class="card" id="upload-section">
+        <p>Upload a PDF, and the AI will generate a custom quiz based on the text.</p>
+        <input type="file" id="pdf-upload" accept="application/pdf">
+        <button id="generateBtn" onclick="generateQuiz()">Generate Quiz</button>
+    </div>
+
+    <div id="loader">⚙️ AI is reading and thinking... (this may take 15-30 seconds locally)</div>
+
+    <div class="card" id="quiz-container">
+        <h2 id="quiz-title">Quiz Title</h2>
+        <div id="questions-wrapper"></div>
+        <button id="submitBtn" onclick="gradeQuiz()" style="margin-top: 20px;">Submit Answers</button>
+    </div>
+
+    <div class="card" id="results-container" style="text-align: center; border: 2px solid var(--primary);">
+        <h2 id="final-score"></h2>
+        <p>Review your feedback above!</p>
+    </div>
+</div>
+
+<script>
+    let globalQuizData = [];
+
+    async function generateQuiz() {
+        const fileInput = document.getElementById('pdf-upload');
+        if (!fileInput.files[0]) return alert("Please select a PDF file first!");
+
+        document.getElementById('generateBtn').disabled = true;
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('quiz-container').style.display = 'none';
+        document.getElementById('results-container').style.display = 'none';
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        try {
+            const response = await fetch('http://localhost:8000/generate-quiz', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) throw new Error("Backend failed. Check your Python terminal.");
+            
+            const data = await response.json();
+            globalQuizData = data.questions; 
+            
+            document.getElementById('quiz-title').innerText = data.quiz_title;
+            
+            const wrapper = document.getElementById('questions-wrapper');
+            wrapper.innerHTML = globalQuizData.map((q, index) => `
+                <div class="question-block" id="qblock-${q.id}">
+                    <div class="question-text">${index + 1}. ${q.question_text}</div>
+                    ${q.options.map(opt => `
+                        <label class="option-label">
+                            <input type="radio" name="q-${q.id}" value="${opt}"> ${opt}
+                        </label>
+                    `).join('')}
+                    <div class="feedback" id="feedback-${q.id}"></div>
+                </div>
+            `).join('');
+
+            document.getElementById('quiz-container').style.display = 'block';
+
+        } catch (error) {
+            alert("Error: " + error.message);
+        } finally {
+            document.getElementById('generateBtn').disabled = false;
+            document.getElementById('loader').style.display = 'none';
+        }
+    }
+
+    async function gradeQuiz() {
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Grading...";
+
+        const submissions = globalQuizData.map(q => {
+            const selected = document.querySelector(`input[name="q-${q.id}"]:checked`);
+            return {
+                question_id: q.id,
+                question_text: q.question_text,
+                correct_answer: q.correct_answer,
+                user_answer: selected ? selected.value : "No answer provided"
+            };
+        });
+
+        try {
+            const response = await fetch('http://localhost:8000/evaluate-answers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ submissions: submissions })
+            });
+
+            const resultData = await response.json();
+
+            resultData.feedback.forEach(fb => {
+                const feedbackDiv = document.getElementById(`feedback-${fb.question_id}`);
+                feedbackDiv.innerText = fb.tutor_message;
+                feedbackDiv.className = `feedback ${fb.is_correct ? 'correct' : 'incorrect'}`;
+            });
+
+            document.getElementById('final-score').innerText = resultData.score_summary;
+            document.getElementById('results-container').style.display = 'block';
+            submitBtn.style.display = 'none';
+
+        } catch (error) {
+            alert("Grading Error: " + error.message);
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit Answers";
+        }
+    }
+</script>
+</body>
+</html>
