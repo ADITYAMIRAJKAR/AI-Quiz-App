@@ -26,6 +26,10 @@
         
         #loader { display: none; text-align: center; font-weight: bold; color: #6B7280; margin: 20px 0; }
         #quiz-container, #results-container { display: none; }
+
+        /* Custom style for the new download button */
+        #download-btn { background-color: #3B82F6; margin-top: 10px; }
+        #download-btn:hover { background-color: #2563EB; }
     </style>
 </head>
 <body>
@@ -45,6 +49,7 @@
         <h2 id="quiz-title">Quiz Title</h2>
         <div id="questions-wrapper"></div>
         <button id="submitBtn" onclick="gradeQuiz()" style="margin-top: 20px;">Submit Answers</button>
+        <button id="download-btn" style="display:none;" onclick="downloadQuiz()">Download Quiz as Text</button>
     </div>
 
     <div class="card" id="results-container" style="text-align: center; border: 2px solid var(--primary);">
@@ -64,6 +69,7 @@
         document.getElementById('loader').style.display = 'block';
         document.getElementById('quiz-container').style.display = 'none';
         document.getElementById('results-container').style.display = 'none';
+        document.getElementById('download-btn').style.display = 'none'; // Hide download initially
 
         const formData = new FormData();
         formData.append("file", fileInput.files[0]);
@@ -95,6 +101,9 @@
             `).join('');
 
             document.getElementById('quiz-container').style.display = 'block';
+            
+            // Show the download button once the quiz loads
+            document.getElementById('download-btn').style.display = 'block';
 
         } catch (error) {
             alert("Error: " + error.message);
@@ -143,6 +152,21 @@
             submitBtn.disabled = false;
             submitBtn.innerText = "Submit Answers";
         }
+    }
+
+    // The new download logic
+    function downloadQuiz() {
+        const quizTitle = document.getElementById('quiz-title').innerText;
+        const quizText = document.getElementById('questions-wrapper').innerText;
+        
+        // Formats the text nicely for the download file
+        const fullText = `=== ${quizTitle} ===\n\n${quizText}`;
+        
+        const blob = new Blob([fullText], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'AI_Quiz.txt';
+        link.click();
     }
 </script>
 </body>

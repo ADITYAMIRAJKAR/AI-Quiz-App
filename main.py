@@ -34,12 +34,18 @@ async def generate_quiz(file: UploadFile = File(...)):
         if not document_text.strip():
             raise HTTPException(status_code=400, detail="Could not extract text from the PDF.")
 
+        # --- THE FIX IS HERE ---
+        # Notice how we explicitly tell the AI to use the EXACT TEXT, not "Option A"
         system_prompt = f"""
-        You are an expert educational assistant. Based ONLY on the provided document text, 
+        You are a strict, objective Quiz Generator API. Based ONLY on the provided document text, 
         generate a 3-question multiple-choice quiz. 
         
         Document Text:
         {document_text}
+
+        Your ONLY job is to output valid JSON. Do not include introductory text, greetings, or formatting like markdown blocks.
+        
+        CRITICAL INSTRUCTION: For the "correct_answer" field, you MUST output the exact text of the correct option. Do NOT write "Option A", "Option B", etc.
 
         Respond ONLY with a valid JSON object strictly matching this schema:
         {{
@@ -48,8 +54,8 @@ async def generate_quiz(file: UploadFile = File(...)):
                 {{
                     "id": 1,
                     "question_text": "The actual question here?",
-                    "options": ["Option A", "Option B", "Option C", "Option D"],
-                    "correct_answer": "Option B"
+                    "options": ["Apple", "Banana", "Orange", "Grape"],
+                    "correct_answer": "Banana"
                 }}
             ]
         }}
@@ -69,18 +75,22 @@ class QuizSubmission(BaseModel):
 async def evaluate_answers(data: QuizSubmission):
     try:
         system_prompt = f"""
-        You are an encouraging tutor. Evaluate the user's answers to these quiz questions.
+        You are a strict, objective automated grading system. 
+        You are receiving a JSON array containing quiz questions, the user's selected answer, and the objectively correct answer.
         
         Data: {json.dumps(data.submissions)}
 
+        Your ONLY job is to compare the "user_answer" to the "correct_answer". 
+        If they do not match exactly, the answer is wrong. 
+        
         Respond ONLY with a valid JSON object strictly matching this schema:
         {{
-            "score_summary": "You got X out of Y correct!",
+            "score_summary": "You got X out of Y correct.",
             "feedback": [
                 {{
                     "question_id": 1,
-                    "is_correct": true,
-                    "tutor_message": "A 1-sentence explanation of why they were right or wrong."
+                    "is_correct": false,
+                    "tutor_message": "Correct! / Incorrect. The correct answer was [insert correct answer here]."
                 }}
             ]
         }}

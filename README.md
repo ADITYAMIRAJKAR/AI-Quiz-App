@@ -32,3 +32,12 @@ Because this application utilizes [Ollama](https://ollama.com/), the entire AI p
    `uvicorn main:app --reload`
 4. Open the `index.html` file in your web browser.
 5. Upload a PDF and generate your quiz!
+
+---
+
+## Development Journal
+
+### Day 2: Prompt Engineering & Feature Expansion
+* **Strict JSON Enforcement:** Overhauled the system prompts to eliminate LLM hallucinations, ensuring the AI strictly outputs clean JSON instead of conversational text.
+* **Grading Logic Fix:** Corrected an issue where the AI was validating "Option A" instead of the literal text, ensuring 100% accurate grading.
+* **Offline Export Feature:** Added a JavaScript function to dynamically generate a downloadable `.txt` file containing the quiz questions, user choices, and AI feedback.
