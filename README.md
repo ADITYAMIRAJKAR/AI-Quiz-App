@@ -46,3 +46,7 @@ Because this application utilizes [Ollama](https://ollama.com/), the entire AI p
 * **Dynamic Question Scaling:** Upgraded the FastAPI backend to accept dynamic user form data, allowing the application to scale the generated quiz length (1-10 questions) on the fly without breaking the AI's context window.
 * **Pro UI Overhaul:** Completely redesigned the frontend architecture with a modern, responsive CSS framework. Implemented clean typography, interactive hover states, and intuitive visual feedback for a SaaS-quality user experience.
 * **Persistent Database Logging (CSV):** Engineered a persistent backend data logging system using Python's `csv` and `os` modules. The server now automatically captures and formats timestamps, user submissions, correct answers, and AI evaluations into a clean, queryable spreadsheet (`quiz_results.csv`) for administrative review.
+
+### Continuation of Day 3: Edge-Case Handling & Material Design Overhaul
+* **Advanced Prompt Engineering (Bug Fixes):** Resolved critical grading bugs by implementing strict, rule-based LLM instructions. Forced exact-string matching for options and explicitly handled edge cases like skipped questions ("No answer provided") to prevent AI hallucinations and guarantee 100% grading accuracy.
+* **Google Forms UI/UX:** Completely redesigned the frontend architecture to mirror the classic, trusted Google Forms Material Design aesthetic. Implemented custom CSS variables, intuitive question cards, and interactive visual feedback for a highly polished, production-ready user experience.

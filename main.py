@@ -11,7 +11,6 @@ from datetime import datetime
 
 app = FastAPI(title="Local AI Quiz Generator & Grader")
 
-# Allows your frontend to communicate with this backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,12 +27,10 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
     if not file.filename.endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are supported.")
 
-    # Cap the maximum questions to prevent the AI from timing out locally
     if num_questions > 10:
         num_questions = 10
 
     try:
-        # Read the PDF
         pdf_reader = PyPDF2.PdfReader(file.file)
         document_text = ""
         for page in pdf_reader.pages:
@@ -41,13 +38,12 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
             if extracted:
                 document_text += extracted + "\n"
         
-        # Limit text length to avoid overflowing the AI's context window
         document_text = document_text[:5000] 
 
         if not document_text.strip():
             raise HTTPException(status_code=400, detail="Could not extract text from the PDF.")
 
-        # STRICT PROMPT for generating questions
+        # FIX 1: Explicit rules added to ensure exact string matching
         system_prompt = f"""
         You are a strict, objective Quiz Generator API. Based ONLY on the provided document text, 
         generate a {num_questions}-question multiple-choice quiz. 
@@ -57,7 +53,9 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
 
         Your ONLY job is to output valid JSON. Do not include introductory text, greetings, or formatting like markdown blocks.
         
-        CRITICAL INSTRUCTION: For the "correct_answer" field, you MUST output the exact text of the correct option. Do NOT write "Option A", "Option B", etc.
+        CRITICAL INSTRUCTIONS: 
+        1. Every question MUST have exactly 4 options in the "options" array.
+        2. The "correct_answer" MUST be an EXACT string match to one of the items inside the "options" array. This is non-negotiable. Do not write "Option A".
 
         Respond ONLY with a valid JSON object strictly matching this schema:
         {{
@@ -89,15 +87,18 @@ class QuizSubmission(BaseModel):
 @app.post("/evaluate-answers")
 async def evaluate_answers(data: QuizSubmission):
     try:
-        # STRICT PROMPT for grading
+        # FIX 2: Explicit grading rules for "No answer provided" and strict matching
         system_prompt = f"""
-        You are a strict, objective automated grading system. 
-        You are receiving a JSON array containing quiz questions, the user's selected answer, and the objectively correct answer.
-        
-        Data: {json.dumps(data.submissions)}
+        You are a strict automated grading system. 
+        Here is the submitted data: {json.dumps(data.submissions)}
 
-        Your ONLY job is to compare the "user_answer" to the "correct_answer". 
-        If they do not match exactly, the answer is wrong. 
+        CRITICAL GRADING RULES:
+        1. Compare "user_answer" to "correct_answer".
+        2. If "user_answer" is exactly "No answer provided", then "is_correct" MUST be false. Your "tutor_message" should say: "You skipped this question. The correct answer was: [correct_answer]."
+        3. If "user_answer" exactly matches "correct_answer", then "is_correct" MUST be true. Your "tutor_message" should say: "Correct!"
+        4. If "user_answer" does not match "correct_answer", then "is_correct" MUST be false. Your "tutor_message" should say: "Incorrect. You chose [user_answer], but the correct answer was [correct_answer]."
+        
+        You MUST return a feedback object for EVERY question ID in the provided data.
         
         Respond ONLY with a valid JSON object strictly matching this schema:
         {{
@@ -112,7 +113,6 @@ async def evaluate_answers(data: QuizSubmission):
         }}
         """
 
-        # Ask the AI to grade the quiz
         response = ollama.generate(model='llama3', prompt=system_prompt, format='json', stream=False)
         result_data = json.loads(response['response'])
 
@@ -120,26 +120,20 @@ async def evaluate_answers(data: QuizSubmission):
         csv_file = "quiz_results.csv"
         file_exists = os.path.isfile(csv_file)
 
-        # Open the CSV file in 'append' mode so we don't overwrite previous quizzes
         with open(csv_file, mode='a', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             
-            # If the file is brand new, write the header row first
             if not file_exists:
                 writer.writerow(["Timestamp", "Question ID", "Question Text", "User Answer", "Correct Answer", "Is Correct", "Tutor Feedback"])
 
-            # Get the exact time the user submitted the quiz
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            # Loop through the user's submissions and save them to the CSV
             for sub in data.submissions:
-                # Match the submission with the AI's feedback
                 feedback = next((item for item in result_data.get('feedback', []) if item.get("question_id") == sub.get("question_id")), None)
 
                 is_correct = feedback["is_correct"] if feedback else False
-                tutor_msg = feedback["tutor_message"] if feedback else "No feedback provided"
+                tutor_msg = feedback["tutor_message"] if feedback else "No feedback provided by AI"
 
-                # Write the row of data into the spreadsheet!
                 writer.writerow([
                     timestamp,
                     sub.get("question_id", ""),
@@ -151,7 +145,6 @@ async def evaluate_answers(data: QuizSubmission):
                 ])
         # ------------------------------
 
-        # Finally, send the grading results back to the frontend website
         return result_data
 
     except Exception as e:
