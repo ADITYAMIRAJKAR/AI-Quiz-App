@@ -3,58 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Document Quiz</title>
+    <title>AI Document Quiz Pro</title>
     <style>
-        :root { --primary: #10B981; --bg-color: #F3F4F6; --card-bg: #FFFFFF; --text: #1F2937; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); color: var(--text); padding: 40px 20px; display: flex; justify-content: center; }
-        .container { max-width: 700px; width: 100%; }
-        h1, h2 { text-align: center; color: var(--primary); }
-        .card { background: var(--card-bg); padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 24px; }
-        input[type="file"] { width: 100%; padding: 12px; border: 2px dashed #D1D5DB; border-radius: 8px; margin-bottom: 16px; cursor: pointer; }
-        button { background-color: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; }
-        button:hover { background-color: #059669; }
-        button:disabled { background-color: #9CA3AF; cursor: not-allowed; }
+        /* Modern Pro UI Variables */
+        :root { 
+            --primary: #4F46E5; 
+            --primary-hover: #4338CA;
+            --secondary: #10B981;
+            --secondary-hover: #059669;
+            --bg-color: #F8FAFC; 
+            --card-bg: #FFFFFF; 
+            --text-main: #0F172A; 
+            --text-light: #64748B;
+            --border: #E2E8F0;
+        }
         
-        .question-block { margin-bottom: 20px; padding: 16px; background: #F9FAFB; border-radius: 8px; border: 1px solid #E5E7EB; }
-        .question-text { font-weight: bold; margin-bottom: 12px; }
-        .option-label { display: block; padding: 8px; margin-bottom: 4px; background: white; border-radius: 4px; border: 1px solid #D1D5DB; cursor: pointer; }
-        .option-label:hover { background: #ECFDF5; }
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg-color); 
+            color: var(--text-main); 
+            padding: 40px 20px; 
+            display: flex; 
+            justify-content: center; 
+            line-height: 1.5;
+        }
         
-        .feedback { margin-top: 10px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
-        .feedback.correct { background: #D1FAE5; color: #065F46; border: 1px solid #34D399; display: block; }
-        .feedback.incorrect { background: #FEE2E2; color: #991B1B; border: 1px solid #F87171; display: block; }
+        .container { max-width: 750px; width: 100%; }
         
-        #loader { display: none; text-align: center; font-weight: bold; color: #6B7280; margin: 20px 0; }
+        h1 { text-align: center; color: var(--text-main); font-weight: 800; font-size: 2.2rem; margin-bottom: 8px;}
+        .subtitle { text-align: center; color: var(--text-light); margin-bottom: 32px; font-size: 1.1rem;}
+        
+        .card { 
+            background: var(--card-bg); 
+            padding: 32px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025); 
+            margin-bottom: 24px; 
+            border: 1px solid var(--border);
+        }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
+        
+        input[type="file"], input[type="number"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px dashed #CBD5E1; 
+            border-radius: 8px; 
+            background: #F8FAFC;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        input[type="number"] { border: 1px solid #CBD5E1; border-style: solid; }
+        input[type="file"]:hover { border-color: var(--primary); }
+        
+        button { 
+            background-color: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 14px 24px; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-weight: 600; 
+            transition: all 0.2s ease-in-out; 
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+        button:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        button:disabled { background-color: #94A3B8; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        #submitBtn { background-color: var(--secondary); box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); margin-top: 24px;}
+        #submitBtn:hover { background-color: var(--secondary-hover); }
+        
+        #download-btn { background-color: #F1F5F9; color: #475569; margin-top: 12px; box-shadow: none; border: 1px solid #E2E8F0;}
+        #download-btn:hover { background-color: #E2E8F0; color: #0F172A;}
+        
+        .question-block { 
+            margin-bottom: 24px; 
+            padding: 24px; 
+            background: #FFFFFF; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+        .question-text { font-weight: 700; margin-bottom: 16px; font-size: 1.1rem; color: #1E293B;}
+        
+        .option-label { 
+            display: block; 
+            padding: 12px 16px; 
+            margin-bottom: 8px; 
+            background: #F8FAFC; 
+            border-radius: 8px; 
+            border: 1px solid var(--border); 
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+        .option-label:hover { background: #EEF2FF; border-color: #C7D2FE; }
+        input[type="radio"] { margin-right: 10px; accent-color: var(--primary); }
+        
+        .feedback { margin-top: 16px; padding: 14px; border-radius: 8px; font-size: 14.5px; display: none; font-weight: 500;}
+        .feedback.correct { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; display: block; }
+        .feedback.incorrect { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; display: block; }
+        
+        #loader { display: none; text-align: center; font-weight: 600; color: var(--primary); margin: 24px 0; }
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(79, 70, 229, 0.3); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s ease-in-out infinite; vertical-align: middle; margin-right: 8px;}
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
         #quiz-container, #results-container { display: none; }
-
-        /* Custom style for the new download button */
-        #download-btn { background-color: #3B82F6; margin-top: 10px; }
-        #download-btn:hover { background-color: #2563EB; }
+        #quiz-title { color: var(--text-main); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--border);}
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>📚 AI Document Quiz</h1>
+    <p class="subtitle">Upload your notes and instantly generate a study guide.</p>
     
     <div class="card" id="upload-section">
-        <p>Upload a PDF, and the AI will generate a custom quiz based on the text.</p>
-        <input type="file" id="pdf-upload" accept="application/pdf">
-        <button id="generateBtn" onclick="generateQuiz()">Generate Quiz</button>
+        <div class="form-group">
+            <label for="pdf-upload">1. Select Document (PDF)</label>
+            <input type="file" id="pdf-upload" accept="application/pdf">
+        </div>
+        
+        <div class="form-group">
+            <label for="num-questions">2. Number of Questions (Max 10)</label>
+            <input type="number" id="num-questions" min="1" max="10" value="3">
+        </div>
+
+        <button id="generateBtn" onclick="generateQuiz()">Generate Custom Quiz</button>
     </div>
 
-    <div id="loader">⚙️ AI is reading and thinking... (this may take 15-30 seconds locally)</div>
+    <div id="loader"><span class="spinner"></span> AI is reading and thinking...</div>
 
     <div class="card" id="quiz-container">
         <h2 id="quiz-title">Quiz Title</h2>
         <div id="questions-wrapper"></div>
-        <button id="submitBtn" onclick="gradeQuiz()" style="margin-top: 20px;">Submit Answers</button>
-        <button id="download-btn" style="display:none;" onclick="downloadQuiz()">Download Quiz as Text</button>
+        <button id="submitBtn" onclick="gradeQuiz()">Submit Answers for Grading</button>
+        <button id="download-btn" style="display:none;" onclick="downloadQuiz()">📥 Download Quiz as Text</button>
     </div>
 
-    <div class="card" id="results-container" style="text-align: center; border: 2px solid var(--primary);">
-        <h2 id="final-score"></h2>
-        <p>Review your feedback above!</p>
+    <div class="card" id="results-container" style="text-align: center; border-color: var(--secondary); background: #ECFDF5;">
+        <h2 id="final-score" style="color: #065F46; margin: 0;"></h2>
+        <p style="color: #047857; margin-top: 8px;">Review your detailed feedback above.</p>
     </div>
 </div>
 
@@ -63,16 +154,19 @@
 
     async function generateQuiz() {
         const fileInput = document.getElementById('pdf-upload');
+        const numQuestions = document.getElementById('num-questions').value;
+        
         if (!fileInput.files[0]) return alert("Please select a PDF file first!");
 
         document.getElementById('generateBtn').disabled = true;
         document.getElementById('loader').style.display = 'block';
         document.getElementById('quiz-container').style.display = 'none';
         document.getElementById('results-container').style.display = 'none';
-        document.getElementById('download-btn').style.display = 'none'; // Hide download initially
+        document.getElementById('download-btn').style.display = 'none';
 
         const formData = new FormData();
         formData.append("file", fileInput.files[0]);
+        formData.append("num_questions", numQuestions); // Sending the number to the backend!
 
         try {
             const response = await fetch('http://localhost:8000/generate-quiz', {
@@ -101,8 +195,6 @@
             `).join('');
 
             document.getElementById('quiz-container').style.display = 'block';
-            
-            // Show the download button once the quiz loads
             document.getElementById('download-btn').style.display = 'block';
 
         } catch (error) {
@@ -116,7 +208,7 @@
     async function gradeQuiz() {
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
-        submitBtn.innerText = "Grading...";
+        submitBtn.innerText = "Grading in progress...";
 
         const submissions = globalQuizData.map(q => {
             const selected = document.querySelector(`input[name="q-${q.id}"]:checked`);
@@ -150,22 +242,18 @@
         } catch (error) {
             alert("Grading Error: " + error.message);
             submitBtn.disabled = false;
-            submitBtn.innerText = "Submit Answers";
+            submitBtn.innerText = "Submit Answers for Grading";
         }
     }
 
-    // The new download logic
     function downloadQuiz() {
         const quizTitle = document.getElementById('quiz-title').innerText;
         const quizText = document.getElementById('questions-wrapper').innerText;
-        
-        // Formats the text nicely for the download file
         const fullText = `=== ${quizTitle} ===\n\n${quizText}`;
-        
         const blob = new Blob([fullText], { type: 'text/plain' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'AI_Quiz.txt';
+        link.download = 'AI_Quiz_Pro.txt';
         link.click();
     }
 </script>

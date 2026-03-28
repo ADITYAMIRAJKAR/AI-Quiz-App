@@ -41,3 +41,8 @@ Because this application utilizes [Ollama](https://ollama.com/), the entire AI p
 * **Strict JSON Enforcement:** Overhauled the system prompts to eliminate LLM hallucinations, ensuring the AI strictly outputs clean JSON instead of conversational text.
 * **Grading Logic Fix:** Corrected an issue where the AI was validating "Option A" instead of the literal text, ensuring 100% accurate grading.
 * **Offline Export Feature:** Added a JavaScript function to dynamically generate a downloadable `.txt` file containing the quiz questions, user choices, and AI feedback.
+
+### Day 3: Dynamic Scaling, Pro UI, and Database Logging
+* **Dynamic Question Scaling:** Upgraded the FastAPI backend to accept dynamic user form data, allowing the application to scale the generated quiz length (1-10 questions) on the fly without breaking the AI's context window.
+* **Pro UI Overhaul:** Completely redesigned the frontend architecture with a modern, responsive CSS framework. Implemented clean typography, interactive hover states, and intuitive visual feedback for a SaaS-quality user experience.
+* **Persistent Database Logging (CSV):** Engineered a persistent backend data logging system using Python's `csv` and `os` modules. The server now automatically captures and formats timestamps, user submissions, correct answers, and AI evaluations into a clean, queryable spreadsheet (`quiz_results.csv`) for administrative review.
