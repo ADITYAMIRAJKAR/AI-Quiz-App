@@ -28,7 +28,7 @@ Built as an internship project, this application bridges the gap between modern 
    * *Fix:* Overhauled the generation prompt to make exact string matching between the `options` array and the `correct_answer` field non-negotiable.
 
 ## Project Structure
-
+```bash
 AI-Quiz-App/
 │
 ├── main.py                # FastAPI backend and LLM routing
@@ -36,7 +36,7 @@ AI-Quiz-App/
 ├── requirements.txt       # Python dependencies
 ├── quiz_results.csv       # Automatically generated database of user scores
 └── README.md              # Project documentation
-
+```bash
 
 ##  Tech Stack
 * **Backend:** Python, FastAPI, Uvicorn
