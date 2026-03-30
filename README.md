@@ -36,6 +36,7 @@ AI-Quiz-App/
 ├── requirements.txt       # Python dependencies
 ├── quiz_results.csv       # Automatically generated database of user scores
 └── README.md              # Project documentation
+```text
 
 ##  Tech Stack
 * **Backend:** Python, FastAPI, Uvicorn
