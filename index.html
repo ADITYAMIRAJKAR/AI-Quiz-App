@@ -4,134 +4,226 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Document Quiz Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Google Forms Aesthetic Variables */
+        /* Custom Modern Tech Aesthetic */
         :root { 
-            --google-purple: rgb(103, 58, 183);
-            --bg-color: rgb(240, 235, 248);
-            --card-bg: #FFFFFF; 
-            --text-main: #202124; 
-            --text-secondary: #5f6368;
-            --border-color: #dadce0;
+            --primary: #0ea5e9; 
+            --primary-hover: #0284c7;
+            --bg-gradient: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            --card-bg: #ffffff; 
+            --text-main: #0f172a; 
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
         }
         
         body { 
-            font-family: 'Roboto', Arial, sans-serif; 
-            background: var(--bg-color); 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-gradient); 
             color: var(--text-main); 
-            padding: 20px; 
+            padding: 30px 20px; 
             display: flex; 
             justify-content: center; 
-            line-height: 1.5;
+            line-height: 1.6;
             margin: 0;
+            min-height: 100vh;
         }
         
-        .container { max-width: 770px; width: 100%; margin-top: 20px;}
+        .container { max-width: 750px; width: 100%; }
         
         .header-card { 
             background: var(--card-bg); 
-            padding: 24px; 
-            border-radius: 8px; 
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3); 
-            margin-bottom: 12px; 
-            border-top: 10px solid var(--google-purple);
+            padding: 32px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            margin-bottom: 24px; 
+            border-top: 6px solid var(--primary);
         }
         
-        h1 { font-size: 32px; font-weight: 400; margin: 0 0 12px 0; }
-        .subtitle { color: var(--text-secondary); margin: 0 0 24px 0; font-size: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 24px;}
+        h1 { font-size: 28px; font-weight: 700; margin: 0 0 8px 0; color: var(--text-main); letter-spacing: -0.5px;}
+        .subtitle { color: var(--text-secondary); margin: 0 0 28px 0; font-size: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 24px;}
         
         .card {
             background: var(--card-bg); 
-            padding: 24px; 
-            border-radius: 8px; 
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3); 
-            margin-bottom: 12px; 
+            padding: 28px; 
+            border-radius: 12px; 
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            margin-bottom: 16px; 
             border: 1px solid transparent;
-            border-left: 0;
-            transition: box-shadow 0.2s;
+            transition: all 0.3s ease;
         }
-        .card:hover { border-left: 6px solid #4285f4; padding-left: 18px; box-shadow: 0 2px 6px 0 rgba(60,64,67,0.3); }
+
+        .card:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+            border-color: #bae6fd;
+        }
 
         .form-group { margin-bottom: 24px; }
-        label { display: block; font-weight: 500; margin-bottom: 12px; font-size: 16px;}
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main); font-size: 15px;}
         
         input[type="file"], input[type="number"] { 
             width: 100%; 
-            padding: 8px 0; 
-            border: none;
-            border-bottom: 1px solid var(--border-color); 
-            background: transparent;
+            padding: 10px 12px; 
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: #f8fafc;
             font-size: 14px;
-            color: var(--text-secondary);
+            color: var(--text-main);
             outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
         }
-        input[type="number"]:focus { border-bottom: 2px solid var(--google-purple); }
+        input[type="number"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); background: #fff;}
+        input[type="file"]::file-selector-button {
+            background: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            margin-right: 12px;
+            transition: background 0.2s;
+        }
+        input[type="file"]::file-selector-button:hover { background: var(--primary-hover); }
         
-        .btn-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+        .btn-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
         
         button { 
-            background-color: var(--google-purple); 
+            background-color: var(--primary); 
             color: white; 
             border: none; 
-            padding: 10px 24px; 
-            border-radius: 4px; 
-            font-size: 14px; 
+            padding: 12px 28px; 
+            border-radius: 6px; 
+            font-size: 15px; 
             cursor: pointer; 
-            font-weight: 500; 
+            font-weight: 600; 
+            transition: all 0.2s;
+        }
+        button:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        button:disabled { background-color: #cbd5e1; color: #64748b; cursor: not-allowed; transform: none; }
+        
+        #download-btn { background-color: transparent; color: var(--text-secondary); border: 1px solid var(--border-color);}
+        #download-btn:hover { background-color: #f1f5f9; color: var(--text-main); }
+        
+        .question-text { font-weight: 600; margin-bottom: 16px; font-size: 16px; color: var(--text-main);}
+        
+        .option-label { 
+            display: flex; 
+            align-items: center;
+            padding: 10px 12px; 
+            margin-bottom: 6px; 
+            cursor: pointer; 
+            font-size: 15px;
+            color: var(--text-main);
+            border-radius: 6px;
             transition: background-color 0.2s;
         }
-        button:hover { background-color: rgb(81, 45, 168); }
-        button:disabled { background-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.26); cursor: default; }
+        .option-label:hover { background-color: #f8fafc; }
+        input[type="radio"] { margin-right: 12px; width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;}
         
-        .question-text { font-weight: 400; margin-bottom: 16px; font-size: 16px;}
-        .option-label { display: flex; align-items: center; padding: 8px 0; margin-bottom: 4px; cursor: pointer; font-size: 14px;}
-        input[type="radio"] { margin-right: 12px; width: 20px; height: 20px; accent-color: var(--google-purple); cursor: pointer;}
+        .feedback { margin-top: 16px; padding: 14px; border-radius: 6px; font-size: 14.5px; display: none; font-weight: 500;}
+        .feedback.correct { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; display: block; }
+        .feedback.incorrect { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; display: block; }
         
-        .feedback { margin-top: 16px; padding: 12px; border-radius: 4px; font-size: 14px; display: none; font-weight: 500;}
-        .feedback.correct { background: #e6f4ea; color: #137333; display: block; }
-        .feedback.incorrect { background: #fce8e6; color: #c5221f; display: block; }
-        
-        #loader { display: none; padding: 24px; text-align: center; color: var(--text-secondary); font-size: 14px;}
+        #loader { display: none; padding: 24px; text-align: center; color: var(--primary); font-weight: 600; font-size: 15px;}
         #quiz-container, #results-container { display: none; }
+        #quiz-title { font-size: 22px; font-weight: 700; margin-bottom: 8px;}
+
+        /* --- SIMPLE REPORT CARD STYLES --- */
+        .report-header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color);}
+        .report-header h2 { margin: 0; font-size: 24px; color: var(--text-main); }
+        .report-header p { margin: 4px 0 0 0; color: var(--text-secondary); font-size: 14px; }
+        
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 16px; 
+            margin-bottom: 16px;
+        }
+        
+        .stat-box { 
+            background: #f8fafc; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            padding: 16px; 
+            text-align: center;
+        }
+        
+        .stat-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; color: var(--text-main);}
+        .stat-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;}
+        
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header-card" id="upload-section">
-        <h1>AI Document Quiz Generator</h1>
-        <p class="subtitle">Upload a PDF document to generate a custom assessment.</p>
+        <h1>AI Quiz & Evaluation Engine</h1>
+        <p class="subtitle">Upload a PDF document to generate a customized, auto-graded assessment.</p>
         
         <div class="form-group">
-            <label for="pdf-upload">Upload Material (PDF)</label>
+            <label for="pdf-upload">Source Material (PDF)</label>
             <input type="file" id="pdf-upload" accept="application/pdf">
         </div>
+        
         <div class="form-group">
-            <label for="num-questions">Number of Questions (1-10)</label>
+            <label for="num-questions">Assessment Length (1-10 Questions)</label>
             <input type="number" id="num-questions" min="1" max="10" value="3">
         </div>
+
         <div class="btn-controls">
-            <button id="generateBtn" onclick="generateQuiz()">Generate Quiz</button>
+            <button id="generateBtn" onclick="generateQuiz()">Generate Assessment</button>
         </div>
     </div>
 
-    <div id="loader">Generating questions based on your document... Please wait.</div>
+    <div id="loader">Analyzing document and generating questions...</div>
 
     <div id="quiz-container">
-        <div class="card">
-            <h2 id="quiz-title">Quiz Title</h2>
-            <p style="color: #5f6368; font-size: 14px; margin: 0;">* Indicates required question</p>
+        <div class="card" style="border-top: 4px solid var(--text-main);">
+            <h2 id="quiz-title">Assessment Title</h2>
+            <p style="color: var(--text-secondary); font-size: 14px; margin: 0;">Please answer all questions before submitting.</p>
         </div>
+
         <div id="questions-wrapper"></div>
-        <div class="btn-controls" style="margin-bottom: 40px;">
-            <button id="submitBtn" onclick="gradeQuiz()">Submit</button>
+        
+        <div class="btn-controls" style="margin-bottom: 40px; margin-top: 24px;">
+            <button id="submitBtn" onclick="gradeQuiz()">Submit for Evaluation</button>
+            <button id="download-btn" style="display:none;" onclick="downloadQuiz()">Export as Text</button>
         </div>
     </div>
 
-    <div class="card" id="results-container" style="border-top: 10px solid #137333;">
-        <h2 id="final-score" style="font-size: 24px; font-weight: 400; color: #137333; margin: 0 0 12px 0;"></h2>
-        <p style="color: var(--text-secondary); margin: 0;">Your response has been recorded. Scroll up to view feedback.</p>
+    <div class="card" id="results-container" style="border-top: 6px solid var(--primary); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+        <div class="report-header">
+            <h2>Official Score Report</h2>
+            
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value" id="rc-total">0</div>
+                <div class="stat-label">Total Questions</div>
+            </div>
+            <div class="stat-box" style="border-bottom: 3px solid var(--success);">
+                <div class="stat-value" id="rc-correct" style="color: var(--success);">0</div>
+                <div class="stat-label">Correct</div>
+            </div>
+            <div class="stat-box" style="border-bottom: 3px solid var(--danger);">
+                <div class="stat-value" id="rc-wrong" style="color: var(--danger);">0</div>
+                <div class="stat-label">Wrong</div>
+            </div>
+            <div class="stat-box" style="background: #fff; border-color: var(--primary); border-width: 2px;">
+                <div class="stat-value" id="rc-fraction" style="font-size: 32px; color: var(--primary);">0/0</div>
+                <div class="stat-label" style="color: var(--text-main);">Final Score</div>
+            </div>
+        </div>
+        
+        <p style="text-align: center; color: var(--text-secondary); font-size: 14px; margin-top: 16px;">
+            
+        </p>
     </div>
 </div>
 
@@ -160,9 +252,7 @@
             });
 
             const data = await response.json();
-            console.log("Raw AI Data Received:", data); // DEBUGGING LINE
-
-            // Safety check in case the AI hallucinates
+            
             if (!data || !data.questions || !Array.isArray(data.questions)) {
                 throw new Error("The AI returned badly formatted data. Please try generating again.");
             }
@@ -173,7 +263,7 @@
             const wrapper = document.getElementById('questions-wrapper');
             wrapper.innerHTML = globalQuizData.map((q, index) => `
                 <div class="card" id="qblock-${q.id}">
-                    <div class="question-text">${index + 1}. ${q.question_text} <span style="color: red;">*</span></div>
+                    <div class="question-text">${index + 1}. ${q.question_text} <span style="color: var(--danger);">*</span></div>
                     ${q.options.map((opt, optIdx) => `
                         <label class="option-label">
                             <input type="radio" name="q-${q.id}" value="${opt.replace(/"/g, '&quot;')}"> 
@@ -185,6 +275,7 @@
             `).join('');
 
             document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('download-btn').style.display = 'block';
 
         } catch (error) {
             console.error("Full Error:", error);
@@ -198,7 +289,7 @@
     async function gradeQuiz() {
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
-        submitBtn.innerText = "Submitting...";
+        submitBtn.innerText = "Evaluating...";
 
         const submissions = globalQuizData.map(q => {
             const selected = document.querySelector(`input[name="q-${q.id}"]:checked`);
@@ -218,11 +309,14 @@
             });
 
             const resultData = await response.json();
-            console.log("Raw Grading Data Received:", resultData); // DEBUGGING LINE
 
             if (!resultData || !resultData.feedback) {
                 throw new Error("AI failed to grade properly.");
             }
+
+            // --- SIMPLE REPORT CARD MATH LOGIC ---
+            let totalQuestions = submissions.length;
+            let correctAnswers = 0;
 
             resultData.feedback.forEach(fb => {
                 const feedbackDiv = document.getElementById(`feedback-${fb.question_id}`);
@@ -230,9 +324,18 @@
                     feedbackDiv.innerText = fb.tutor_message;
                     feedbackDiv.className = `feedback ${fb.is_correct ? 'correct' : 'incorrect'}`;
                 }
+                if (fb.is_correct) correctAnswers++;
             });
 
-            document.getElementById('final-score').innerText = resultData.score_summary || "Grading Complete";
+            // Calculate wrong answers
+            let wrongAnswers = totalQuestions - correctAnswers;
+
+            // Update the new DOM elements
+            document.getElementById('rc-total').innerText = totalQuestions;
+            document.getElementById('rc-correct').innerText = correctAnswers;
+            document.getElementById('rc-wrong').innerText = wrongAnswers;
+            document.getElementById('rc-fraction').innerText = `${correctAnswers}/${totalQuestions}`;
+
             document.getElementById('results-container').style.display = 'block';
             submitBtn.style.display = 'none';
 
@@ -240,8 +343,19 @@
             console.error("Full Error:", error);
             alert("Grading Error: " + error.message);
             submitBtn.disabled = false;
-            submitBtn.innerText = "Submit";
+            submitBtn.innerText = "Submit for Evaluation";
         }
+    }
+
+    function downloadQuiz() {
+        const quizTitle = document.getElementById('quiz-title').innerText;
+        const quizText = document.getElementById('questions-wrapper').innerText;
+        const fullText = `=== ${quizTitle} ===\n\n${quizText}`;
+        const blob = new Blob([fullText], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'AI_Assessment_Export.txt';
+        link.click();
     }
 </script>
 </body>

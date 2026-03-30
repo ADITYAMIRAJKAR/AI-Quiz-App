@@ -43,7 +43,6 @@ async def generate_quiz(file: UploadFile = File(...), num_questions: int = Form(
         if not document_text.strip():
             raise HTTPException(status_code=400, detail="Could not extract text from the PDF.")
 
-        # FIX 1: Explicit rules added to ensure exact string matching
         system_prompt = f"""
         You are a strict, objective Quiz Generator API. Based ONLY on the provided document text, 
         generate a {num_questions}-question multiple-choice quiz. 
@@ -87,7 +86,6 @@ class QuizSubmission(BaseModel):
 @app.post("/evaluate-answers")
 async def evaluate_answers(data: QuizSubmission):
     try:
-        # FIX 2: Explicit grading rules for "No answer provided" and strict matching
         system_prompt = f"""
         You are a strict automated grading system. 
         Here is the submitted data: {json.dumps(data.submissions)}
@@ -102,7 +100,6 @@ async def evaluate_answers(data: QuizSubmission):
         
         Respond ONLY with a valid JSON object strictly matching this schema:
         {{
-            "score_summary": "You got X out of Y correct.",
             "feedback": [
                 {{
                     "question_id": 1,
@@ -115,6 +112,15 @@ async def evaluate_answers(data: QuizSubmission):
 
         response = ollama.generate(model='llama3', prompt=system_prompt, format='json', stream=False)
         result_data = json.loads(response['response'])
+
+        # --- FIX: DETERMINISTIC PYTHON COUNTING ---
+        # We manually count the 'True' values so the AI doesn't have to do math.
+        total_questions = len(data.submissions)
+        correct_count = sum(1 for fb in result_data.get('feedback', []) if fb.get('is_correct') == True)
+        
+        # We inject the perfect score back into the JSON before sending it to the frontend
+        result_data['score_summary'] = f"You got {correct_count} out of {total_questions} correct."
+        # ------------------------------------------
 
         # --- CSV LOGGING LOGIC ---
         csv_file = "quiz_results.csv"
