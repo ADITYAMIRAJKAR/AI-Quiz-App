@@ -3,6 +3,9 @@
 A full-stack, privacy-first web application that allows users to upload PDF documents and automatically generates a multiple-choice quiz using a local Large Language Model (LLM). It also features an AI-powered grading system that provides custom, objective feedback for the user's answers.
 
 Because this application utilizes [Ollama](https://ollama.com/), the entire AI pipeline runs 100% locally on your machine. No data is sent to external APIs like OpenAI or Google, ensuring complete document privacy.
+## Project Documentation Video
+[Watch Project Demo](https://drive.google.com/file/d/1VfNEwGSvlJnPvyLPlBHdur6qnzlVkXEb/view?usp=sharing)
+This video demonstrates the complete workflow, features, architecture, and final output of the project.
 
 ## What is this project?
 This is a full-stack, local AI-powered web application that transforms static reading materials into interactive assessments. Users can upload a PDF document, and the application will instantly generate a custom multiple-choice quiz based strictly on the document's content, auto-grade the user's answers, and log the results into a database.
